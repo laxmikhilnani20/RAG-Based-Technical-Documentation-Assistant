@@ -18,7 +18,7 @@ def generate_chunk_id(url: str, chunk_index: int) -> str:
     hash_input = f"{url}_{chunk_index}".encode("utf-8")
     return hashlib.md5(hash_input).hexdigest()
 
-def ingest_urls(urls: List[str]) -> Dict[str, Any]:
+def ingest_urls(urls: List[str], api_key: str = None) -> Dict[str, Any]:
     """
     Fetches, chunks, and indexes a list of URLs into ChromaDB.
     Returns statistics about the ingestion process.
@@ -77,7 +77,7 @@ def ingest_urls(urls: List[str]) -> Dict[str, Any]:
         final_chunks.append(chunk)
 
     # 4. Store in ChromaDB
-    vector_store = get_vector_store()
+    vector_store = get_vector_store(api_key)
     
     # Add documents with explicit IDs to handle upserts natively
     vector_store.add_documents(documents=final_chunks, ids=ids)
@@ -91,7 +91,7 @@ def ingest_urls(urls: List[str]) -> Dict[str, Any]:
         "message": f"Successfully ingested {len(docs)} documents into {len(final_chunks)} chunks."
     }
 
-def ingest_file(file_path: str, source_name: str) -> Dict[str, Any]:
+def ingest_file(file_path: str, source_name: str, api_key: str = None) -> Dict[str, Any]:
     """
     Ingests a single local file (e.g., PDF) into ChromaDB.
     """
@@ -132,7 +132,7 @@ def ingest_file(file_path: str, source_name: str) -> Dict[str, Any]:
         chunk.metadata["chunk_index"] = chunk_idx
         chunk.metadata["source_type"] = "file"
 
-    vector_store = get_vector_store()
+    vector_store = get_vector_store(api_key)
     vector_store.add_documents(documents=chunks, ids=ids)
     
     return {

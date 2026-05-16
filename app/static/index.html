@@ -17,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=1.1">
 </head>
 <body>
     <div class="app-container">
@@ -43,6 +43,24 @@
                     <h3>Status</h3>
                     <p><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> API Online</p>
                     <p><i class="fa-solid fa-database" style="color: #60a5fa;"></i> ChromaDB Linked</p>
+                </div>
+                
+                <div class="info-card settings-card">
+                    <h3>Settings</h3>
+                    <label for="api-key-input" style="font-size: 0.8rem; color: var(--text-secondary);">Gemini API Key</label>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
+                        <input type="password" id="api-key-input" placeholder="AIzaSy..." class="form-input" style="margin-top: 0;">
+                        <button id="save-key-btn" class="form-btn" style="margin-top: 0; width: auto; padding: 0 1rem;" title="Save Key"><i class="fa-solid fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <div class="info-card upload-card">
+                    <h3>Upload Document</h3>
+                    <form id="upload-form" class="upload-form">
+                        <input type="file" id="file-upload" accept=".pdf" class="form-input file-input" required>
+                        <button type="submit" id="upload-btn" class="form-btn"><i class="fa-solid fa-upload"></i> Ingest PDF</button>
+                    </form>
+                    <div id="upload-status" class="upload-status"></div>
                 </div>
             </div>
             
@@ -89,6 +107,6 @@
     </div>
 
     <!-- Custom JS -->
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=1.1"></script>
 </body>
 </html>

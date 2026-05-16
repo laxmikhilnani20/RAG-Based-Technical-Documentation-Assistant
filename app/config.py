@@ -2,8 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # LLM Settings
-    GEMINI_API_KEY: str
-    GEMINI_LLM_MODEL: str = "models/gemini-2.5-flash-lite"
+    GEMINI_LLM_MODEL: str = "models/gemini-1.5-flash"
     GEMINI_EMBEDDING_MODEL: str = "models/gemini-embedding-2"
 
     # ChromaDB Settings

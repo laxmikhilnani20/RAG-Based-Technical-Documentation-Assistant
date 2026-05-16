@@ -12,10 +12,13 @@ from app.rag.vector_store import get_retriever
 logger = logging.getLogger(__name__)
 
 # Initialize the LLM
-def get_llm():
+def get_llm(api_key: str = None):
+    if not api_key or api_key == "your_gemini_api_key_here":
+        raise ValueError("A valid Gemini API Key must be provided by the user.")
+        
     return ChatGoogleGenerativeAI(
         model=settings.GEMINI_LLM_MODEL,
-        google_api_key=settings.GEMINI_API_KEY,
+        google_api_key=api_key,
         temperature=0
     )
 
@@ -38,7 +41,8 @@ def analyze_query(state: RAGState) -> Dict[str, Any]:
     """
     logger.info("NODE: analyze_query")
     question = state["question"]
-    llm = get_llm()
+    api_key = state.get("api_key")
+    llm = get_llm(api_key)
     
     prompt = f"""You are a query analysis expert for a technical documentation retrieval system.
 Your task is to take a raw user question and output a rewritten query optimized for vector search (cosine similarity).
@@ -63,8 +67,9 @@ def retrieve_docs(state: RAGState) -> Dict[str, Any]:
     """
     logger.info("NODE: retrieve_docs")
     rewritten_query = state.get("rewritten_query", state["question"])
+    api_key = state.get("api_key")
     
-    retriever = get_retriever()
+    retriever = get_retriever(api_key)
     docs = retriever.invoke(rewritten_query)
     
     logger.info(f"Retrieved {len(docs)} documents.")
@@ -77,8 +82,9 @@ def grade_documents(state: RAGState) -> Dict[str, Any]:
     logger.info("NODE: grade_documents")
     question = state["question"]
     docs = state.get("retrieved_docs", [])
+    api_key = state.get("api_key")
     
-    llm = get_llm()
+    llm = get_llm(api_key)
     structured_llm = llm.with_structured_output(GraderOutput)
     
     graded_docs = []
@@ -113,8 +119,9 @@ def rewrite_query(state: RAGState) -> Dict[str, Any]:
     logger.info("NODE: rewrite_query")
     question = state["question"]
     retry_count = state.get("retry_count", 0) + 1
+    api_key = state.get("api_key")
     
-    llm = get_llm()
+    llm = get_llm(api_key)
     
     prompt = f"""You are an expert at reformulating questions for technical vector search.
 The previous search for the following question failed to yield relevant documents.
@@ -174,7 +181,8 @@ def generate_answer(state: RAGState) -> Dict[str, Any]:
         
     context_str = "\n".join(context_parts)
     
-    llm = get_llm()
+    api_key = state.get("api_key")
+    llm = get_llm(api_key)
     prompt = f"""You are an expert technical assistant for LangGraph, LangChain, and FastAPI.
 Answer the user's question clearly and accurately based ONLY on the provided context documents.
 If the context does not contain the answer, say "I don't know" - do not hallucinate.

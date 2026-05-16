@@ -7,11 +7,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def get_vector_store() -> Chroma:
+def get_vector_store(api_key: str = None) -> Chroma:
     """
     Initializes and returns the Chroma vector store instance.
     """
-    embeddings = get_embeddings()
+    embeddings = get_embeddings(api_key)
     
     # Ensure the directory exists
     os.makedirs(settings.CHROMA_DB_PATH, exist_ok=True)
@@ -28,11 +28,11 @@ def get_vector_store() -> Chroma:
     
     return vector_store
 
-def get_retriever():
+def get_retriever(api_key: str = None):
     """
     Returns a configured retriever from the vector store.
     """
-    vector_store = get_vector_store()
+    vector_store = get_vector_store(api_key)
     return vector_store.as_retriever(
         search_kwargs={"k": settings.RETRIEVAL_TOP_K}
     )

@@ -1,6 +1,7 @@
 import uuid
 import logging
-from fastapi import APIRouter, HTTPException
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Header
 from app.api.models import QueryRequest, QueryResponse, Citation
 from app.graph.workflow import graph_app
 from app.graph.state import RAGState
@@ -9,8 +10,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("/query", response_model=QueryResponse, summary="Submit a question to the assistant")
-async def query_assistant(request: QueryRequest):
+async def query_assistant(request: QueryRequest, x_api_key: Optional[str] = Header(None)):
     logger.info(f"Received query: {request.question}")
+    
+    if x_api_key:
+        masked_key = f"{x_api_key[:6]}...{x_api_key[-4:]}"
+        logger.info(f"Using user-provided API key: {masked_key}")
+    else:
+        logger.warning("No API key provided in request headers!")
     
     # Initialize the state for the LangGraph workflow
     initial_state: RAGState = {
@@ -23,7 +30,8 @@ async def query_assistant(request: QueryRequest):
         "citations": [],
         "retry_count": 0,
         "answer_found": False,
-        "session_id": request.session_id or str(uuid.uuid4())
+        "session_id": request.session_id or str(uuid.uuid4()),
+        "api_key": x_api_key
     }
     
     try:

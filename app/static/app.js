@@ -3,6 +3,35 @@ const queryInput = document.getElementById('query-input');
 const chatHistory = document.getElementById('chat-history');
 const sendBtn = document.getElementById('send-btn');
 
+const apiKeyInput = document.getElementById('api-key-input');
+const saveKeyBtn = document.getElementById('save-key-btn');
+const uploadForm = document.getElementById('upload-form');
+const fileUpload = document.getElementById('file-upload');
+const uploadStatus = document.getElementById('upload-status');
+
+// Load saved API key on startup
+if (localStorage.getItem('gemini_api_key')) {
+    apiKeyInput.value = localStorage.getItem('gemini_api_key');
+}
+
+if (saveKeyBtn) {
+    saveKeyBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+            localStorage.setItem('gemini_api_key', key);
+            
+            // Visual feedback
+            const originalHtml = saveKeyBtn.innerHTML;
+            saveKeyBtn.innerHTML = '<i class="fa-solid fa-check-double"></i>';
+            saveKeyBtn.style.color = '#4ade80';
+            setTimeout(() => {
+                saveKeyBtn.innerHTML = originalHtml;
+                saveKeyBtn.style.color = '';
+            }, 2000);
+        }
+    });
+}
+
 let currentSessionId = null;
 
 // Handle form submission
@@ -10,6 +39,12 @@ chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const question = queryInput.value.trim();
     if (!question) return;
+
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+        addAssistantMessage("**Error:** Please enter your Gemini API Key in the Settings panel before asking questions.", []);
+        return;
+    }
 
     // 1. Add User Message
     addUserMessage(question);
@@ -29,7 +64,10 @@ chatForm.addEventListener('submit', async (e) => {
 
         const response = await fetch('/query', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            },
             body: JSON.stringify(payload)
         });
 
@@ -171,4 +209,47 @@ async function submitFeedback(btnElement, queryId, rating) {
     } catch (e) {
         console.error("Failed to submit feedback", e);
     }
+}
+
+// File Upload Handler
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            uploadStatus.textContent = "Error: Please enter your Gemini API Key first.";
+            uploadStatus.className = "upload-status error";
+            return;
+        }
+        
+        const file = fileUpload.files[0];
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        uploadStatus.textContent = "Uploading and ingesting...";
+        uploadStatus.className = "upload-status";
+        
+        try {
+            const response = await fetch('/ingest/file', {
+                method: 'POST',
+                headers: { 'x-api-key': apiKey },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.detail || "Upload failed");
+            }
+            
+            uploadStatus.textContent = `Success: Ingested ${data.chunks_created} chunks.`;
+            fileUpload.value = ''; // Reset input
+        } catch (error) {
+            uploadStatus.textContent = `Error: ${error.message}`;
+            uploadStatus.className = "upload-status error";
+        }
+    });
 }

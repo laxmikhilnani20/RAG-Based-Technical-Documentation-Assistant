@@ -4,15 +4,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def get_embeddings() -> GoogleGenerativeAIEmbeddings:
+def get_embeddings(api_key: str = None) -> GoogleGenerativeAIEmbeddings:
     """
     Initializes and returns the Gemini embedding model.
     """
-    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == "your_gemini_api_key_here":
-        logger.error("GEMINI_API_KEY is missing or not set properly in the environment.")
-        raise ValueError("Valid GEMINI_API_KEY is required to initialize embeddings.")
+    if not api_key or api_key == "your_gemini_api_key_here":
+        logger.error("API key was not provided by the user.")
+        raise ValueError("A valid Gemini API Key must be provided by the user.")
 
     return GoogleGenerativeAIEmbeddings(
         model=settings.GEMINI_EMBEDDING_MODEL,
-        google_api_key=settings.GEMINI_API_KEY
+        google_api_key=api_key
     )
