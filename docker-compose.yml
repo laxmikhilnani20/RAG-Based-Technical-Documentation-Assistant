@@ -36,6 +36,7 @@ services:
     # Without this, your vector store resets every time!
     # ------------------------------------------------------------
     volumes:
+      - ./:/app                      # Mount source code for hot-reloading
       - chroma_data:/app/chroma_db   # Persistent vector store
       - ./docs_corpus:/app/docs_corpus  # Source documents
 
