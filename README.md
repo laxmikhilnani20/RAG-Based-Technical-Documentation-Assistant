@@ -648,6 +648,22 @@ RAG-Based Technical Documentation Assistant/
 
 ---
 
+---
+
+## Author
+
+<div align="center">
+
+**Laxmi Khilnani**
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-laxmikhilnani20.github.io-4B5563?style=for-the-badge&logo=github&logoColor=white)](https://laxmikhilnani20.github.io/Resume/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-laxmi--khilnani20-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/laxmi-khilnani20/)
+[![GitHub](https://img.shields.io/badge/GitHub-laxmikhilnani20-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/laxmikhilnani20)
+
+</div>
+
+---
+
 <div align="center">
 
 Built for the **Express Analytics AI/ML Engineer Intern** take-home assignment.
